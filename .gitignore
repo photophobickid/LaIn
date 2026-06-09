@@ -2,6 +2,10 @@
 __pycache__/
 *.pyc
 
+# Секреты (не коммитить!)
+.env
+.env/
+
 # PyInstaller
 build/
 dist/
