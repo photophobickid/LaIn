@@ -9,6 +9,7 @@ dist/
 
 # Установщик (артефакт сборки)
 installer/*.exe
+!installer/LayoutIndicator-Setup-*.exe
 
 # Releases — exe хранится в репозитории
 !Releases/

@@ -1,8 +1,8 @@
 ; Inno Setup script для Layout Indicator
-; Сборка: ISCC.exe installer.iss  ->  installer\LayoutIndicator-Setup-1.0.exe
+; Сборка: ISCC.exe installer.iss  ->  installer\LayoutIndicator-Setup-1.1.exe
 
 #define AppName "Layout Indicator"
-#define AppVersion "1.0"
+#define AppVersion "1.1"
 #define AppPublisher "Layout Indicator"
 #define ExeName "LayoutIndicator.exe"
 
@@ -31,12 +31,12 @@ Name: "russian"; MessagesFile: "compiler:Languages\Russian.isl"
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Tasks]
-Name: "autostart"; Description: "Запускать при входе в Windows"; GroupDescription: "Дополнительно:"
+Name: "autostart"; Description: "Запускать при входе в Windows"; GroupDescription: "Дополнительно:"; Flags: checkedonce
 Name: "desktopicon"; Description: "Создать ярлык на рабочем столе"; GroupDescription: "Дополнительно:"; Flags: unchecked
-Name: "launchnow"; Description: "Запустить сразу после установки"; GroupDescription: "Дополнительно:"
+Name: "launchnow"; Description: "Запустить сразу после установки"; GroupDescription: "Дополнительно:"; Flags: checkedonce
 
 [Files]
-Source: "dist\{#ExeName}"; DestDir: "{app}"; Flags: ignoreversion
+Source: "dist\{#ExeName}"; DestDir: "{app}"; Flags: ignoreversion restartreplace
 
 [Icons]
 Name: "{group}\Layout Indicator"; Filename: "{app}\{#ExeName}"
@@ -52,6 +52,15 @@ Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; \
 [Run]
 Filename: "{app}\{#ExeName}"; Description: "Запустить Layout Indicator"; \
     Flags: nowait postinstall skipifsilent; Tasks: launchnow
+
+[Code]
+function InitializeSetup(): Boolean;
+var
+  ResultCode: Integer;
+begin
+  Exec('taskkill.exe', '/F /IM {#ExeName}', '', SW_HIDE, ewWaitUntilTerminated, ResultCode);
+  Result := True;
+end;
 
 [UninstallRun]
 ; Завершить работающий процесс перед удалением
