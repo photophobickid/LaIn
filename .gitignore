@@ -9,3 +9,7 @@ dist/
 
 # Установщик (артефакт сборки)
 installer/*.exe
+
+# Releases — exe хранится в репозитории
+!Releases/
+!Releases/*.exe

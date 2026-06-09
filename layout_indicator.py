@@ -30,16 +30,17 @@ OPACITY = 0.85           # общая прозрачность (0..1)
 TRANSPARENT = "magenta"  # цвет, который станет полностью прозрачным
 POLL_MS = 40             # период обновления, мс
 
-# Мягкая пастельная палитра (двухбуквенный ISO-код -> цвет фона)
-COLORS = {
-    "EN": "#6E9BE6",  # спокойный синий
-    "RU": "#E68A8A",  # мягкий коралловый
-    "DE": "#E6C173",  # тёплый песочный
-    "FR": "#8AA8E6",  # светло-голубой
-    "UK": "#E6D27A",  # приглушённый жёлтый
-    "ES": "#E6A973",  # мягкий оранжевый
+# Aurora Glass — современная палитра с эффектом неонового стеклянного кольца.
+# Каждая раскладка: core (насыщенный центр), glow (светящийся ореол), text (контраст).
+PALETTE = {
+    "EN": {"core": "#4F46E5", "glow": "#818CF8", "text": "#EEF2FF"},  # indigo
+    "RU": {"core": "#E11D48", "glow": "#FB7185", "text": "#FFF1F2"},  # rose
+    "DE": {"core": "#D97706", "glow": "#FBBF24", "text": "#FFFBEB"},  # amber
+    "FR": {"core": "#0284C7", "glow": "#38BDF8", "text": "#F0F9FF"},  # sky
+    "UK": {"core": "#7C3AED", "glow": "#A78BFA", "text": "#F5F3FF"},  # violet
+    "ES": {"core": "#EA580C", "glow": "#FB923C", "text": "#FFF7ED"},  # orange
 }
-DEFAULT_COLOR = "#86C2A1"  # мягкий зелёный для прочих раскладок
+DEFAULT_PALETTE = {"core": "#0D9488", "glow": "#2DD4BF", "text": "#F0FDFA"}  # teal
 
 # --- WinAPI ---
 user32 = ctypes.windll.user32
@@ -124,14 +125,20 @@ class Indicator:
         )
         self.canvas.pack()
 
-        pad = 1
-        self.oval = self.canvas.create_oval(
+        pad = 0
+        inner = 3
+        colors = DEFAULT_PALETTE
+        self.glow_oval = self.canvas.create_oval(
             pad, pad, SIZE - pad, SIZE - pad,
-            fill=DEFAULT_COLOR, outline="#FFFFFF", width=1,
+            fill=colors["glow"], outline="",
+        )
+        self.core_oval = self.canvas.create_oval(
+            inner, inner, SIZE - inner, SIZE - inner,
+            fill=colors["core"], outline="",
         )
         self.text = self.canvas.create_text(
-            SIZE / 2 + 1, SIZE / 2, text="..",
-            fill="#FFFFFF", font=("Segoe UI", 6, "bold"),
+            SIZE / 2, SIZE / 2, text="..",
+            fill=colors["text"], font=("Segoe UI Semibold", 5, "bold"),
         )
 
         # Прозрачность + сквозные клики (после того как окно создано)
@@ -156,9 +163,10 @@ class Indicator:
         code = get_active_layout_code()
         if code != self._last_code:
             self._last_code = code
-            color = COLORS.get(code, DEFAULT_COLOR)
-            self.canvas.itemconfig(self.oval, fill=color)
-            self.canvas.itemconfig(self.text, text=code)
+            colors = PALETTE.get(code, DEFAULT_PALETTE)
+            self.canvas.itemconfig(self.glow_oval, fill=colors["glow"])
+            self.canvas.itemconfig(self.core_oval, fill=colors["core"])
+            self.canvas.itemconfig(self.text, text=code, fill=colors["text"])
 
         self.root.after(POLL_MS, self.update)
 
